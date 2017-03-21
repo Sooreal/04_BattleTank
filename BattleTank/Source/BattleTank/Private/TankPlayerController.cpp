@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Tank.h"
 #include "BattleTank.h"
+#include "Tank.h"
 #include "TankPlayerController.h"
 
 void ATankPlayerController::BeginPlay()
@@ -100,15 +100,25 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVec
 	auto StartLocation = PlayerCameraManager->GetCameraLocation(); //one of many many ways of finding the camera location
 	auto EndLocation = StartLocation + (LookDirection * LineTraceRange); //self-explanatory
 
+	/*const FName TraceTag("TraceTag");
+	GetWorld()->DebugDrawTraceTag = TraceTag;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.TraceTag = TraceTag;
+	CollisionParams.AddIgnoredActor(GetPawn());*/
+
+
 	if ( GetWorld()->LineTraceSingleByChannel(
 			HitResult,
 			StartLocation,
 			EndLocation,
-			ECollisionChannel::ECC_Visibility)) //HIT ANYTHING THAT IS VISIBLE
+			ECollisionChannel::ECC_Visibility //HIT ANYTHING THAT IS VISIBLE
+			/*CollisionParams*/)) 
 	{
 			//Set Hit Location
 			
 			HitLocation = HitResult.Location;
+			//auto Time = GetWorld()->GetTimeSeconds();
+			//UE_LOG(LogTemp, Warning, TEXT(" %f: HitLocation: %s"), Time, *HitLocation.ToString());
 
 			return true;
 	}

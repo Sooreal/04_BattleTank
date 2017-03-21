@@ -3,7 +3,7 @@
 #include "BattleTank.h"
 #include "TankBarrel.h"
 #include "TankAimingComponent.h"
-
+#include "TankTurret.h"
 
 // Sets default values for this component's properties
 UTankAimingComponent::UTankAimingComponent()
@@ -18,38 +18,49 @@ UTankAimingComponent::UTankAimingComponent()
 
 void UTankAimingComponent::SetBarrelReference(UTankBarrel * BarrelToSet)
 {
+	if (!BarrelToSet) { return; }
 	Barrel = BarrelToSet;
+}
+
+void UTankAimingComponent::SetTurretReference(UTankTurret * TurretToSet)
+{
+	if (!TurretToSet) { return; }
+	Turret = TurretToSet;
 }
 
 
 void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 {
-	if (!Barrel) { return; };
+	if (!Turret || !Barrel) { return; };	
 
 	//TankAimingcomponent is sufficient as WorldContextObject
 	FVector OutLaunchVelocity; //TossVelocity is an OUT parameter
 	FVector StartLocation = Barrel->GetSocketLocation(FName("Projectile")); //WE MAKE A SOCKET ON THE BARREL...and reference it directly (if it fails it returns the location of the Barrel)
 
 	//calculate the OutLaunchVelocity
-		if( UGameplayStatics::SuggestProjectileVelocity(
-					this, //TankAimingcomponent is sufficient as WorldContextObject
-					OutLaunchVelocity,//TossVelocity is an OUT parameter
-					StartLocation, //WE MAKE A SOCKET ON THE BARREL...and reference it directly (if it fails it returns the location of the Barrel)
-					HitLocation, //this is the end location
-					LaunchSpeed, //the speed is the main variable that is used to calculate the arc, hence the direction	
-					false,
-					0,
-					0,
-					ESuggestProjVelocityTraceOption::DoNotTrace	//Parameter must be present to prevent bug
-					) 
-			)
+	bool bHaveAimSolution = UGameplayStatics::SuggestProjectileVelocity
+	(
+		this,
+		OutLaunchVelocity,
+		StartLocation,
+		HitLocation,
+		LaunchSpeed,
+		false,
+		0,
+		0,
+		ESuggestProjVelocityTraceOption::OnlyTraceWhileAscending // Paramater must be present to prevent bug
+	);
+
+
+
+		if( bHaveAimSolution )
 		{ 
 			auto AimDirection = OutLaunchVelocity.GetSafeNormal(); //Unitize
 
-			MoveBarrelTowards(AimDirection);
+			MoveBarrelTowards(AimDirection);			
 
 			auto Time = GetWorld()->GetTimeSeconds();
-			UE_LOG(LogTemp, Warning, TEXT("%f: aim solution founf"), Time);
+			UE_LOG(LogTemp, Warning, TEXT("%f: aim solution found"), Time);
 
 			//auto TankName = GetOwner()->GetName();
 			//UE_LOG(LogTemp, Warning, TEXT("%s Aiming at %s"),*TankName, *Aimdirection.ToString());
@@ -68,7 +79,8 @@ void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 }
 
 void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
-{
+{	
+
 	//Work out difference between the current barrel rotation and AimDirection
 	auto BarrelRotator = Barrel->GetForwardVector().Rotation(); //this is the X Direction and we get three rotations in a single struct
 	auto AimAsRotator = AimDirection.Rotation();
@@ -76,7 +88,9 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 
 	//UE_LOG(LogTemp, Warning, TEXT("AimAsRotator: %s "), *DeltaRotator.ToString());
 
-	Barrel->Elevate(5);
-	
+	Barrel->Elevate(DeltaRotator.Pitch);
+	Turret->Rotate(DeltaRotator.Yaw);
 }
+
+
 
