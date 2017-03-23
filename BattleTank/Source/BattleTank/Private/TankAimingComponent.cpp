@@ -31,7 +31,7 @@ void UTankAimingComponent::SetTurretReference(UTankTurret * TurretToSet)
 
 void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 {
-	if (!Turret || !Barrel) { return; };	
+	if (!Turret || !Barrel) { return; }	
 
 	//TankAimingcomponent is sufficient as WorldContextObject
 	FVector OutLaunchVelocity; //TossVelocity is an OUT parameter
