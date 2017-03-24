@@ -36,10 +36,16 @@ void ATankAIController::Tick(float DeltaTime)
 		//Aim towards the player
 		if(PlayerTank)
 		{
+			//Move towards the Player
+			MoveToActor(PlayerTank,
+				AcceptanceRadius //when the tank is as close as this they STOP - it is in CM						
+				);
+
+			//aim towards the player
 			ControlledTank->AimAt(PlayerTank->GetActorLocation());		
 
 			//Fire if we ready
-				ControlledTank->Fire(); //TODO Do not fire every frame
+				ControlledTank->Fire(); 
 		}	
 
 }
