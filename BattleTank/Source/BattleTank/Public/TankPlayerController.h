@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "TankPlayerController.generated.h"
 
+
 class ATank;
 /**
  * 
@@ -16,9 +17,12 @@ class BATTLETANK_API ATankPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 
+protected:
+	    UFUNCTION(BlueprintCallable, Category = "Setup")
+		ATank* GetControlledTank() const;
+
 private:
 
-		ATank* GetControlledTank() const;
 	
 	  virtual void BeginPlay() override; //override says :" pleas make sur there is a function exactly like this  up in the inheritance chain
 								//it will find it in the AActor...where it is virtual void..low and behold		
