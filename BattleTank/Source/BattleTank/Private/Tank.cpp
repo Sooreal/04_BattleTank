@@ -18,8 +18,19 @@ ATank::ATank()
 	PrimaryActorTick.bCanEverTick = false;
 
 	//No need to protect points as added at construction
-	//TankAimingComponent = CreateDefaultSubobject<UTankAimingComponent>(FName("Aiming Component"));	
+	//TankAimingComponent = CreateDefaultSubobject<UTanWkAimingComponent>(FName("Aiming Component"));
 
+	auto TankName = GetName();
+	UE_LOG(LogTemp, Warning, TEXT("%s DONKEY: Tank C++ Construct"), *TankName)
+
+}
+
+void ATank::BeginPlay()
+{
+	Super::BeginPlay(); //Needed for BP Begin Play to run!
+
+	auto TankName = GetName();
+	UE_LOG(LogTemp, Warning, TEXT("%s DONKEY: Tank C++ Begin Play"), *TankName)
 }
 
 

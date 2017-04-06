@@ -2,6 +2,7 @@
 
 
 #include "BattleTank.h"
+#include "TankAimingComponent.h"
 #include "Tank.h"
 #include "TankPlayerController.h"
 
@@ -10,6 +11,12 @@ void ATankPlayerController::BeginPlay()
 	//WE ALWAYS WANT TO START WITH Super - the boilerplate code does it always
 	//SUPER means call the default behaviour before doing anything else
 	Super::BeginPlay();
+	
+	auto AimingComponent = GetControlledTank()->FindComponentByClass<UTankAimingComponent>();
+	if(AimingComponent)
+		FoundAimingComponent(AimingComponent);
+	else
+		UE_LOG(LogTemp, Warning, TEXT("Player Controller cannot find Aiming Component at Begin Play."));
 
 	UE_LOG(LogTemp, Warning, TEXT("Player Controller begin play."));
 
