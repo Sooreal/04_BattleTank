@@ -7,7 +7,7 @@
 
 void UTankMovementComponent::Initialise(UTankTrack* LeftTrackToSet, UTankTrack* RightTrackToSet)
 {
-	if (!LeftTrackToSet || !RightTrackToSet) { return; }
+	if (!ensure(LeftTrackToSet && RightTrackToSet)) { return; }
 
 	LeftTrack = LeftTrackToSet;
 	RightTrack = RightTrackToSet;
@@ -33,6 +33,7 @@ void UTankMovementComponent::RequestDirectMove(const FVector& MoveVelocity, bool
 
 void UTankMovementComponent::IntendMoveForward(float Throw)
 {
+	if (!ensure(LeftTrack && RightTrack)) { return; }
 	//UE_LOG(LogTemp, Warning, TEXT("Intend move forward throw: %f"), Throw);
 
 	LeftTrack->SetThrottle(Throw);
@@ -42,7 +43,10 @@ void UTankMovementComponent::IntendMoveForward(float Throw)
 
 void UTankMovementComponent::IntendTurnRight(float Throw)
 {
-	//If we want to turn right, the right track will go backwards and the left one forwards
+	//If we want to turn LeftTrack, the right track will go backwards and the left one forwards
+	if (!ensure(LeftTrack && RightTrack)) { return; }
+
+	//UE_LOG(LogTemp, Warning, TEXT("Intend move right throw: %f"), Throw);
 
 	LeftTrack->SetThrottle(Throw);
 	RightTrack->SetThrottle(-Throw);

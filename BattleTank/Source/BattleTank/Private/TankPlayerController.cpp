@@ -3,33 +3,32 @@
 
 #include "BattleTank.h"
 #include "TankAimingComponent.h"
-#include "Tank.h"
 #include "TankPlayerController.h"
 
 void ATankPlayerController::BeginPlay()
 {
 	//WE ALWAYS WANT TO START WITH Super - the boilerplate code does it always
 	//SUPER means call the default behaviour before doing anything else
-	Super::BeginPlay();
+	Super::BeginPlay();	
 	
-	auto AimingComponent = GetControlledTank()->FindComponentByClass<UTankAimingComponent>();
-	if(AimingComponent)
-		FoundAimingComponent(AimingComponent);
-	else
-		UE_LOG(LogTemp, Warning, TEXT("Player Controller cannot find Aiming Component at Begin Play."));
 
+	auto AimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
+	if (!ensure(AimingComponent)) { return; }
+	FoundAimingComponent(AimingComponent);
+	
 	UE_LOG(LogTemp, Warning, TEXT("Player Controller begin play."));
-
+	
+	/*
 	auto controlledtank = GetControlledTank();
 
-	if(controlledtank)
+	if(ensure(controlledtank))
 	{ 
 		UE_LOG(LogTemp, Warning, TEXT("We have our tank. %s"), *(controlledtank->GetName()));
 	}
 	else
 	{ 
 		UE_LOG(LogTemp, Warning, TEXT("No tank possessed."));
-	}
+	}*/
 
 }
 
@@ -45,7 +44,11 @@ void ATankPlayerController::Tick(float DeltaTime)
 
 void ATankPlayerController::AimAtCrosshair()
 {
-	if (!GetControlledTank()) { return; }
+	if (!GetPawn()) { return; }
+
+	auto AimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
+	if (!ensure(AimingComponent)) { return; }
+	
 
 	//Get world location if you linetrace through the Crosshair 
 	FVector HitLocation;
@@ -57,7 +60,7 @@ void ATankPlayerController::AimAtCrosshair()
 			//UE_LOG(LogTemp, Warning, TEXT("Hit Location: %s"), *HitLocation.ToString());
 
 			//Tell the controlled tank to aim at this point
-			GetControlledTank()->AimAt(HitLocation);
+			AimingComponent->AimAt(HitLocation);
 		}
 		
 }
@@ -95,11 +98,6 @@ bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector& 
 	
 }
 
-
-ATank* ATankPlayerController::GetControlledTank() const
-{	
-	return Cast<ATank>(GetPawn());
-}
 
 bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const  
 {
