@@ -12,7 +12,8 @@ enum class EFiringState : uint8
 {
 	Reloading,
 	Aiming,
-	Locked
+	Locked,
+	OutOfAmmo
 };
 
 //forward Declaration
@@ -31,6 +32,11 @@ public:
 	UTankAimingComponent();
 
 	void AimAt(FVector HitLocation);
+
+	EFiringState GetFiringState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Firing") //Category tells us in which BP category to put this function
+	int GetRoundsLeft() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Firing") //Category tells us in which BP category to put this function
 	void Fire();
@@ -66,5 +72,7 @@ private:
 		float ReloadTimeInSeconds = 3;
 
 	double LastFireTime = 0;
-	
+
+	int RoundsLeft = 3;	
+
 };
